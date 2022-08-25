@@ -16,7 +16,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 
 @bot.command()
-async def cuss(ctx, user):
+async def cuss(ctx, *, user):
 	await ctx.channel.send(random.choice(bad_words) + user)
 
 # command to add tag + url
