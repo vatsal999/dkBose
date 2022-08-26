@@ -1,6 +1,7 @@
 import discord
 import random
 import datetime
+from zoneinfo import ZoneInfo
 import json
 import os
 from dotenv import load_dotenv
@@ -13,22 +14,41 @@ intents.message_content = True
 
 bad_words = ["bsdk ", "gandu ", "mc ", "bc ", "randi "]
 
-bot = commands.Bot(command_prefix="!", intents=intents)
+command_prefix = "bsdk "
+bot = commands.Bot(command_prefix , intents=intents)
 
 
 @bot.command()
 async def cuss(ctx, *, user):
 	await ctx.channel.send(random.choice(bad_words) + user)
 
-# command to add tag + url
-@bot.command()
-async def tag(ctx, arg, URL):
-        # await ctx.channel.
 
-        await ctx.channel.send(arg)
+# command to add tag + url
+# async def tag(ctx, arg, msgID):
+@bot.command()
+async def tag(ctx):
+        # await ctx.channel
+        # fetch_message(id)
+        f = open('tag.json')
+        taglist = json.loads(f.read())
+        for i in taglist["tags"]["tag_name"]:
+            print(taglist[i])
+        f.close()
+
+
+@bot.command(help="Displays user avatar")
+async def avatar(ctx):
+        embedVar = discord.Embed(title=ctx.author.name + "'s Avatar", color=0x1D2021)
+
+        embedVar.set_image(url=ctx.author.avatar.url)
+        embedVar.timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
+        embedVar.set_footer(text="Requested by:" + ctx.author.name)
+        
+        await ctx.channel.send(embed=embedVar)
+    
 
 # lists all the tags available
-@bot.command()
+@bot.command(help='lists all tags available for !tag <tagname>')
 async def taglist(ctx):
         f = open('tag.json')
         taglist = json.loads(f.read())
@@ -36,7 +56,8 @@ async def taglist(ctx):
 
         embedVar = discord.Embed(title="tags",description=tag_names, color=0x1D2021)
         embedVar.timestamp = datetime.datetime.utcnow()
-        embedVar.set_footer(text="use !tag <tag>")
+
+        embedVar.set_footer(text=f"use: {command_prefix}tag <tag>")
 
         await ctx.channel.send(embed=embedVar)
 
@@ -45,6 +66,10 @@ async def taglist(ctx):
         # await ctx.channel.send(taglist["tag_name"])
         f.close()
 
+#@bot.command(name="rimg")
+#sync def reddit_img(ctx, subreddit):
+#await bot.process_commands(message)
+        
 
 DISCORD_TOKEN = os.getenv('TOKEN')
 bot.run(DISCORD_TOKEN)
