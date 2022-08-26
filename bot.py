@@ -1,5 +1,6 @@
 import discord
 import random
+import datetime
 import json
 import os
 from dotenv import load_dotenv
@@ -31,14 +32,18 @@ async def tag(ctx, arg, URL):
 async def taglist(ctx):
         f = open('tag.json')
         taglist = json.loads(f.read())
-        for i in taglist["tags"]:
-            await ctx.channel.send(i["tag_name"])
+        tag_names = ', '.join((i["tag_name"]) for i in taglist["tags"])
+
+        embedVar = discord.Embed(title="tags",description=tag_names, color=0x1D2021)
+        embedVar.timestamp = datetime.datetime.utcnow()
+        embedVar.set_footer(text="use !tag <tag>")
+
+        await ctx.channel.send(embed=embedVar)
+
+        #await ctx.channel.send(tag_names)
         # await ctx.channel.send(taglist["tags"][i]["tag_name"])
         # await ctx.channel.send(taglist["tag_name"])
         f.close()
-
-
-
 
 
 DISCORD_TOKEN = os.getenv('TOKEN')
