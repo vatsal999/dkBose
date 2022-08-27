@@ -4,6 +4,7 @@ import datetime
 from zoneinfo import ZoneInfo
 import json
 import os
+import typing
 from dotenv import load_dotenv
 from discord.ext import commands
 
@@ -40,10 +41,14 @@ async def cuss(ctx, *, user):
 
 
 @bot.command(help="Displays user avatar")
-async def avatar(ctx):
-        embedVar = discord.Embed(title=ctx.author.name + "'s Avatar")
+async def avatar(ctx, arg: typing.Optional[discord.Member]):
+        if (arg):
+            user = arg
+        else:
+            user = ctx.author
+        embedVar = discord.Embed(title=user.name + "'s Avatar")
 
-        embedVar.set_image(url=ctx.author.avatar.url)
+        embedVar.set_image(url=user.avatar.url)
         embedVar.timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
         embedVar.set_footer(text="Requested by " + ctx.author.name)
         
