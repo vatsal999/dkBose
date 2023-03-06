@@ -5,6 +5,7 @@ from zoneinfo import ZoneInfo
 import json
 import os
 import typing
+import urllib3
 from dotenv import load_dotenv
 from discord.ext import commands
 
@@ -91,6 +92,30 @@ async def quote(ctx, msgID):
 #sync def reddit_img(ctx, subreddit):
 #await bot.process_commands(message)
         
+
+@bot.command()
+async def img(ctx, subreddit):
+        http = urllib3.PoolManager()
+        url = "https://reddit.com/r/" + subreddit + "/top.json"
+        bruh = http.request('GET', url, timeout = 2.0)
+        jsonData = json.loads(bruh.data.decode('utf-8'))
+        # print(jsonData[0])
+
+        # await ctx.channel.send(0 in jsonData)
+        number_of_posts = jsonData['data']['dist']
+        image_posts = [];
+        for i in range(0, number_of_posts):
+            img_title = jsonData['data']['children'][i]['data']['title']
+            img_url = jsonData['data']['children'][i]['data']['url']
+            if img_url.endswith('.png') or img_url.endswith('.jpg') or img_url.endswith('.gif'):
+                image_posts.append((img_title, img_url))
+        print(f"number of image posts: {len(image_posts)}")
+        random_post = random.choice(image_posts)
+        print(f"image url: {random_post[1]}")
+        embedVar = discord.Embed(title=random_post[0])
+        embedVar.set_image(url=random_post[1])
+        embedVar.set_footer(text=f"Requested by " + ctx.author.name)
+        await ctx.channel.send(embed=embedVar)
 
 DISCORD_TOKEN = os.getenv('TOKEN')
 bot.run(DISCORD_TOKEN)
