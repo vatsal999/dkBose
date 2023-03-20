@@ -99,19 +99,32 @@ async def img(ctx, subreddit):
         url = "https://reddit.com/r/" + subreddit + "/top.json"
         bruh = http.request('GET', url, timeout = 2.0)
         jsonData = json.loads(bruh.data.decode('utf-8'))
-        # print(jsonData[0])
 
-        # await ctx.channel.send(0 in jsonData)
-        number_of_posts = jsonData['data']['dist']
+        try:
+            number_of_posts = jsonData['data']['dist']
+        except KeyError:
+            await ctx.channel.send("Too many requests, try again later")
+            return
+
         image_posts = [];
         for i in range(0, number_of_posts):
-            img_title = jsonData['data']['children'][i]['data']['title']
-            img_url = jsonData['data']['children'][i]['data']['url']
+            post_data = jsonData['data']['children'][i]['data']
+            img_title = post_data['title']
+            img_url = post_data['url']
             if img_url.endswith('.png') or img_url.endswith('.jpg') or img_url.endswith('.gif'):
                 image_posts.append((img_title, img_url))
-        print(f"number of image posts: {len(image_posts)}")
+            elif "gallery" in img_url:
+                media_id = post_data['gallery_data']['items'][0]['media_id']
+                img_url = post_data['media_metadata'][media_id]['s']['u']
+                img_url = img_url.replace("preview", "i", 1)
+                img_url = img_url[:img_url.index('?')]
+                image_posts.append((img_title, img_url))
+
+        if (len(image_posts) == 0):
+            await ctx.channel.send(f"Top posts of r/{subreddit} do not have images\n")
+            return
+
         random_post = random.choice(image_posts)
-        print(f"image url: {random_post[1]}")
         embedVar = discord.Embed(title=random_post[0])
         embedVar.set_image(url=random_post[1])
         embedVar.set_footer(text=f"Requested by " + ctx.author.name)
