@@ -51,7 +51,7 @@ async def avatar(ctx, arg: typing.Optional[discord.Member]):
 
         embedVar.set_image(url=user.avatar.url)
         embedVar.timestamp = datetime.datetime.now(tz=ZoneInfo('Asia/Kolkata'))
-        embedVar.set_footer(text="Requested by " + ctx.author.name)
+        embedVar.set_footer(text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar)
         
         await ctx.channel.send(embed=embedVar)
     
@@ -127,7 +127,7 @@ async def img(ctx, subreddit):
         random_post = random.choice(image_posts)
         embedVar = discord.Embed(title=random_post[0])
         embedVar.set_image(url=random_post[1])
-        embedVar.set_footer(text=f"Requested by " + ctx.author.name)
+        embedVar.set_footer(text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar)
         await ctx.channel.send(embed=embedVar)
 
 DISCORD_TOKEN = os.getenv('TOKEN')
