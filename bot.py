@@ -130,5 +130,29 @@ async def img(ctx, subreddit):
         embedVar.set_footer(text=f"Requested by {ctx.author.name}", icon_url=ctx.author.avatar)
         await ctx.channel.send(embed=embedVar)
 
+
+@bot.command(help="sends a random pinned message of user")
+async def pinned(ctx, user : discord.Member):
+    pinned_messages = await ctx.channel.pins()
+    user_messages = []
+    for message in pinned_messages:
+        if (message.author.name == user.name and message.author.discriminator == user.discriminator):
+            user_messages.append(message)
+
+    if not user_messages:
+        await ctx.channel.send("User has no pinned messages in this channel")
+        return
+
+    msgobj = random.choice(user_messages)
+
+    embedVar = discord.Embed(title="Jump to message", description=msgobj.content, url=msgobj.jump_url)
+    if msgobj.attachments:
+        embedVar.set_image(url=msgobj.attachments[0].url)
+    embedVar.timestamp = msgobj.created_at
+    embedVar.set_footer(text=user.name, icon_url=user.avatar)
+
+    await ctx.channel.send(embed=embedVar)
+
+
 DISCORD_TOKEN = os.getenv('TOKEN')
 bot.run(DISCORD_TOKEN)
