@@ -146,3 +146,5 @@ async def pinned(ctx, user: discord.Member):
 
 DISCORD_TOKEN = os.getenv('TOKEN')
 bot.run(DISCORD_TOKEN)
+
+maa chuda
